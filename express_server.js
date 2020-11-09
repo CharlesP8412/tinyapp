@@ -50,12 +50,20 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
 
+//POST > Create new shortURL 
 app.post("/urls", (req, res) => {
   const inputLongURL = req.body.longURL;  // req.body =  { longURL: 'google.ca' }
   const urlID = generateRandomString();
   urlDatabase[urlID] = inputLongURL;
   res.redirect(`/urls/${urlID}`)
   // res.send("Ok");         // Respond with 'Ok' (we will replace this)
+});
+
+//POST > DELETE an Entry from DB
+app.post("/urls/*/delete", (req, res) => {
+  shortURL = req.url.substring(6,12)
+  delete urlDatabase[shortURL];
+  res.redirect(`/urls/`)
 });
 
 //Short URL Info
