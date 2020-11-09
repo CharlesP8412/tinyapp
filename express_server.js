@@ -62,6 +62,7 @@ app.post("/urls", (req, res) => {
 //POST > DELETE an Entry from DB
 app.post("/urls/*/delete", (req, res) => {
   shortURL = req.url.substring(6,12)
+  console.log(`Deleted Entry for ${shortURL}, ${urlDatabase[shortURL]}`)
   delete urlDatabase[shortURL];
   res.redirect(`/urls/`)
 });
