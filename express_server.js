@@ -69,8 +69,7 @@ app.get("/urls/:shortURL", (req, res) => {
 app.get("/u/:shortURL", (req, res) => {
   const longURL = urlDatabase[req.params.shortURL];
   if (longURL === undefined){
-    res.redirect(`/urls`)
-    // res.send("ERROR, shortCode Not in Database")   // PLACE HOLDER 
+    res.redirect(`/urls`)  // If code doesnt exist sent to My URLS ... Nice to add Message of some sort
   }
   res.redirect(longURL)
 });
