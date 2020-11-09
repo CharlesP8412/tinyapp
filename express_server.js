@@ -1,12 +1,12 @@
 //====== Requirements / Modules =============================================
 const express = require("express");
 const app = express();
-const PORT = 8080; 
+const PORT = 8080;
 const bodyParser = require("body-parser");
 
 //======= MiddleWare Settings ====================================================
 app.set('view engine', 'ejs');
-app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.urlencoded({ extended: true }));
 
 
 //========= Site Info & Functions ==================================================
@@ -16,7 +16,7 @@ const urlDatabase = {
 };
 
 function generateRandomString() {
-  return Math.random().toString(36).substring(2,8);
+  return Math.random().toString(36).substring(2, 8);
 }
 
 
@@ -37,12 +37,12 @@ app.get("/hello", (req, res) => {
   res.render("hello_world", templateVars);
 });
 
- app.get("/urls", (req, res) =>{
-   const templateVars = {urls: urlDatabase};
-   res.render("urls_index", templateVars);
- });
+app.get("/urls", (req, res) => {
+  const templateVars = { urls: urlDatabase };
+  res.render("urls_index", templateVars);
+});
 
- app.get("/urls.json", (req, res) => {
+app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
 
@@ -51,11 +51,14 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  console.log(req.body);  // Log the POST request body to the console
-  res.send("Ok");         // Respond with 'Ok' (we will replace this)
+  const inputLongURL = req.body.longURL;  // req.body =  { longURL: 'google.ca' }
+  const urlID = generateRandomString();
+  urlDatabase[urlID] = inputLongURL;
+  res.redirect(`/urls/${urlID}`)
+  // res.send("Ok");         // Respond with 'Ok' (we will replace this)
 });
 
-app.get("/urls/:shortURL", (req,res) =>{
+app.get("/urls/:shortURL", (req, res) => {
   const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
   res.render("urls_show", templateVars);
 });
