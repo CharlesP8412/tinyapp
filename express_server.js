@@ -23,19 +23,19 @@ function generateRandomString() {
 //========Set Server to Listen===================================================
 
 app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}!`);
+  console.log(`TinyApp listening on port ${PORT}!`);
 });
 
 //=========Method Handling========================================================
-app.get("/", (req, res) => {
-  res.send("Hello!");
-});
+// app.get("/", (req, res) => {
+//   res.send("Hello!");
+// });
 
-app.get("/hello", (req, res) => {
-  const templateVars = { greeting: 'Hello World!' };
-  //param 1 is the EJS file(./views), param 2 is what data its using
-  res.render("hello_world", templateVars);
-});
+// app.get("/hello", (req, res) => {
+//   const templateVars = { greeting: 'Hello World!' };
+//   //param 1 is the EJS file(./views), param 2 is what data its using
+//   res.render("hello_world", templateVars);
+// });
 
 app.get("/urls", (req, res) => {
   const templateVars = { urls: urlDatabase };
@@ -59,8 +59,17 @@ app.post("/urls", (req, res) => {
   // res.send("Ok");         // Respond with 'Ok' (we will replace this)
 });
 
+//POST > EDIT an Entry in DB
+app.post("/urls/:shortURL/edit", (req, res) => {
+  const inputLongURL = req.body.longURL;
+  shortURL = req.url.substring(6,12)
+  console.log(`EDIT Entry for ${shortURL}, is now ${inputLongURL}`)
+  urlDatabase[shortURL]= inputLongURL;
+  res.redirect(`/urls/`)
+});
+
 //POST > DELETE an Entry from DB
-app.post("/urls/*/delete", (req, res) => {
+app.post("/urls/:shortURL/delete", (req, res) => {
   shortURL = req.url.substring(6,12)
   console.log(`Deleted Entry for ${shortURL}, ${urlDatabase[shortURL]}`)
   delete urlDatabase[shortURL];
