@@ -59,14 +59,7 @@ app.post("/urls", (req, res) => {
   // res.send("Ok");         // Respond with 'Ok' (we will replace this)
 });
 
-//POST > EDIT an Entry in DB
-app.post("/urls/:shortURL/edit", (req, res) => {
-  const inputLongURL = req.body.longURL;
-  shortURL = req.url.substring(6,12)
-  console.log(`EDIT Entry for ${shortURL}, is now ${inputLongURL}`)
-  urlDatabase[shortURL]= inputLongURL;
-  res.redirect(`/urls/`)
-});
+
 
 //POST > DELETE an Entry from DB
 app.post("/urls/:shortURL/delete", (req, res) => {
@@ -81,6 +74,15 @@ app.get("/urls/:shortURL", (req, res) => {
   const longURL = urlDatabase[req.params.shortURL];
   const templateVars = { shortURL: req.params.shortURL, longURL: longURL };
   res.render("urls_show", templateVars);
+});
+
+//POST > EDIT an Entry in DB
+app.post("/urls/:shortURL", (req, res) => {
+  const inputLongURL = req.body.longURL;
+  shortURL = req.url.substring(6,12)
+  console.log(`EDIT Entry for ${shortURL}, is now ${inputLongURL}`)
+  urlDatabase[shortURL]= inputLongURL;
+  res.redirect(`/urls/`)
 });
 
 //Redirect to LongURL (using the shortURL)
