@@ -14,16 +14,21 @@
 
         <!--IF LOGGED IN, show UserName and Logout Button, else Login  -->
         <% if(username){ %>
-          <h3>Logged in as: <%= username %></h3>
+        <form class="form-inline" action="/logout" method="POST">
+          <h6>Logged in as: <%= username %>  </h6>
           <button type="submit" class="btn btn-outline-dark">Logout</button>
+        </form>
         <% }else{%>
 
-          <form class="form-inline" action="/login" method="POST">
+
+        <!--Offer Login Option -->
+        <form class="form-inline" action="/login" method="POST">
           <input class="form-control" type="text" name="username" placeholder="Username"
             style="width: 150px; margin: 1em">
           <button type="submit" class="btn btn-outline-dark">Login</button>
-          <% }%>
-          <!-- FORM ------------------------------------------------------------------------------    -->
+        </form>
+        <% }%>
+        <!-- FORM ------------------------------------------------------------------------------    -->
 
       </div>
     </div>
