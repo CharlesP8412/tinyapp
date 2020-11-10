@@ -18,6 +18,24 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+const users = { 
+  "userRandomID": {
+    id: "userRandomID", 
+    email: "user@example.com", 
+    password: "purple-monkey-dinosaur"
+  },
+ "user2RandomID": {
+    id: "user2RandomID", 
+    email: "user2@example.com", 
+    password: "dishwasher-funk"
+  },
+  "user0": {
+    id: "user0", 
+    email: "chuck@example.com", 
+    password: "1234"
+  }
+}
+
 function generateRandomString() {
   return Math.random().toString(36).substring(2, 8);
 }
@@ -70,6 +88,26 @@ app.post("/logout", (req, res) => {
   res.clearCookie('name')
   res.redirect(`/urls/`)
 });
+
+
+app.post("/register", (req,res) =>{
+  const userEmail = req.body.email
+  const userPass = req.body.password
+  const userID = generateRandomString();
+  users[userID] = {
+    id: userID,
+    email: userEmail,
+    password: userPass
+  };
+  //Set Cookie w. ID
+  console.log("NEW REG:",users[userID]['id'])
+  res.cookie('name', users[userID]['id']); 
+  
+
+  //redirect to /urls
+  res.redirect(`/urls/`)
+
+})
 
 
 app.get("/urls/new", (req, res) => {
