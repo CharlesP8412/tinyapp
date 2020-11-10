@@ -22,6 +22,7 @@ function generateRandomString() {
   return Math.random().toString(36).substring(2, 8);
 }
 
+let cookies = {};
 
 //========Set Server to Listen===================================================
 
@@ -41,7 +42,8 @@ app.get("/", (req, res) => {
 // });
 
 app.get("/urls", (req, res) => {
-  const templateVars = { urls: urlDatabase };
+  console.log(req.cookies.name)
+  const templateVars = { urls: urlDatabase, username: req.cookies.name };
   res.render("urls_index", templateVars);
 });
 
@@ -52,9 +54,10 @@ app.get("/urls.json", (req, res) => {
 
 // LOGIN
 app.post("/login", (req, res) => {
-  res.cookie('username', req.body.username);
-  const templateVars = { urls: urlDatabase, cookieUser: req.cookies["username"] };
-  console.log(urls, cookieUser)
+  const inputUsername = req.body.username
+  res.cookie('name', inputUsername);      //Sends cookie TO CLIENT
+  const templateVars = { urls: urlDatabase, username: inputUsername };
+  console.log(templateVars.username)  
   res.render("urls_index", templateVars);
 });
 
