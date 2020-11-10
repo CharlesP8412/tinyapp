@@ -3,10 +3,13 @@ const express = require("express");
 const app = express();
 const PORT = 8080;
 const bodyParser = require("body-parser");
+const cookieParser = require('cookie-parser')
 
-//======= MiddleWare Settings ====================================================
+//======= Settings ====================================================
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cookieParser())
+
 
 
 //========= Site Info & Functions ==================================================
@@ -27,9 +30,9 @@ app.listen(PORT, () => {
 });
 
 //=========Method Handling========================================================
-// app.get("/", (req, res) => {
-//   res.send("Hello!");
-// });
+app.get("/", (req, res) => {
+  res.redirect(`/urls/`)
+});
 
 // app.get("/hello", (req, res) => {
 //   const templateVars = { greeting: 'Hello World!' };
@@ -45,6 +48,16 @@ app.get("/urls", (req, res) => {
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
+
+
+// LOGIN
+app.post("/login", (req, res) => {
+  res.cookie('username', req.body.username);
+  const templateVars = { urls: urlDatabase, cookieUser: req.cookies["username"] };
+  console.log(urls, cookieUser)
+  res.render("urls_index", templateVars);
+});
+
 
 app.get("/urls/new", (req, res) => {
   res.render("urls_new");
@@ -63,7 +76,7 @@ app.post("/urls", (req, res) => {
 
 //POST > DELETE an Entry from DB
 app.post("/urls/:shortURL/delete", (req, res) => {
-  shortURL = req.url.substring(6,12)
+  shortURL = req.url.substring(6, 12)
   console.log(`Deleted Entry for ${shortURL}, ${urlDatabase[shortURL]}`)
   delete urlDatabase[shortURL];
   res.redirect(`/urls/`)
@@ -79,16 +92,16 @@ app.get("/urls/:shortURL", (req, res) => {
 //POST > EDIT an Entry in DB
 app.post("/urls/:shortURL", (req, res) => {
   const inputLongURL = req.body.longURL;
-  shortURL = req.url.substring(6,12)
+  shortURL = req.url.substring(6, 12)
   console.log(`EDIT Entry for ${shortURL}, is now ${inputLongURL}`)
-  urlDatabase[shortURL]= inputLongURL;
+  urlDatabase[shortURL] = inputLongURL;
   res.redirect(`/urls/`)
 });
 
 //Redirect to LongURL (using the shortURL)
 app.get("/u/:shortURL", (req, res) => {
   const longURL = urlDatabase[req.params.shortURL];
-  if (longURL === undefined){
+  if (longURL === undefined) {
     res.redirect(`/urls`)  // If code doesnt exist sent to My URLS ... Nice to add Message of some sort
   }
   res.redirect(longURL)
