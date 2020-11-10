@@ -59,7 +59,9 @@ app.get("/", (req, res) => {
 });
 
 app.get("/register", (req,res) =>{
-  const templateVars = { urls: urlDatabase, username: req.cookies.name };
+  const cookieID = req.cookies.name;
+  const userEmail = users[cookieID]['email']
+  const templateVars = { urls: urlDatabase, username: userEmail };
   res.render("urls_register", templateVars)
 });
 
