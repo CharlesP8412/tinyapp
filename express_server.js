@@ -30,15 +30,12 @@ app.listen(PORT, () => {
 });
 
 //=========Method Handling========================================================
+
+
 app.get("/", (req, res) => {
   res.redirect(`/urls/`)
 });
 
-// app.get("/hello", (req, res) => {
-//   const templateVars = { greeting: 'Hello World!' };
-//   //param 1 is the EJS file(./views), param 2 is what data its using
-//   res.render("hello_world", templateVars);
-// });
 
 app.get("/urls", (req, res) => {
   const templateVars = { urls: urlDatabase, username: req.cookies.name };
@@ -55,12 +52,13 @@ app.post("/login", (req, res) => {
   const inputUsername = req.body.username
   res.cookie('name', inputUsername);      //Sends cookie TO CLIENT
   const templateVars = { urls: urlDatabase, username: inputUsername };
-  console.log(templateVars.username)  
+  console.log(templateVars.username + " LOGGED IN")  
   res.render("urls_index", templateVars);
 });
 
 //LOGOUT
 app.post("/logout", (req, res) => {
+  console.log(req.body.username + " Logged OUT")
   res.clearCookie('name')
   res.redirect(`/urls/`)
 });
@@ -114,6 +112,12 @@ app.get("/u/:shortURL", (req, res) => {
   }
   res.redirect(longURL)
 });
+
+// app.get("/hello", (req, res) => {
+//   const templateVars = { greeting: 'Hello World!' };
+//   //param 1 is the EJS file(./views), param 2 is what data its using
+//   res.render("hello_world", templateVars);
+// });
 
  //===============================================================================
 

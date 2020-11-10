@@ -9,28 +9,27 @@
       <div class="navbar-nav">
         <a class="nav-item nav-link" href="/urls">My URLs</a>
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
-
-        <!-- FORM ------------------------------------------------------------------------------    -->
+      </div>
+    </div>
+    <!-- FORM ------------------------------------------------------------------------------    -->
 
         <!--IF LOGGED IN, show UserName and Logout Button, else Login  -->
         <% if(username){ %>
-        <form class="form-inline" action="/logout" method="POST">
-          <h6>Logged in as: <%= username %>  </h6>
-          <button type="submit" class="btn btn-outline-dark">Logout</button>
-        </form>
-        <% }else{%>
-
-
-        <!--Offer Login Option -->
-        <form class="form-inline" action="/login" method="POST">
-          <input class="form-control" type="text" name="username" placeholder="Username"
-            style="width: 150px; margin: 1em">
-          <button type="submit" class="btn btn-outline-dark">Login</button>
-        </form>
-        <% }%>
-        <!-- FORM ------------------------------------------------------------------------------    -->
-
-      </div>
-    </div>
+          <form class="form-inline" action="/logout" method="POST">
+            <h6>Logged in as: <%= username %>  </h6>
+            <button type="submit" class="btn btn-outline-dark">Logout</button>
+          </form>
+          <% }else{%>
+  
+  
+          <!--Offer Login Option -->
+          <form class="form-inline" action="/login" method="POST">
+            <input class="form-control" type="text" name="username" placeholder="Username"
+              style="width: 150px; margin: 1em">
+            <button type="submit" class="btn btn-outline-dark">Login</button>
+          </form>
+          <% }%>
+          <!-- FORM ------------------------------------------------------------------------------    -->
+  
   </nav>
 </header>
