@@ -47,6 +47,15 @@ const checkCookie = function (cookieID) {
   return true;
 }
 
+const checkEmailExists = function (inputEmail) {
+  for (user in users) {
+    if (inputEmail === user.email) {
+      return true;
+    }
+  }
+  return false;
+}
+
 
 
 
@@ -67,14 +76,8 @@ app.get("/", (req, res) => {
   res.redirect(`/urls/`)
 });
 
-app.get("/register", (req, res) => {
-  const cookieID = req.cookies.name;
-  let userEmail = null;
-  if (checkCookie(cookieID) === true) {
-    userEmail = users[cookieID].email;
-  }
-  const templateVars = { urls: urlDatabase, username: userEmail };
-  res.render("urls_register", templateVars)
+app.get("/urls.json", (req, res) => {
+  res.json(urlDatabase);
 });
 
 app.get("/urls", (req, res) => {
@@ -87,9 +90,37 @@ app.get("/urls", (req, res) => {
   res.render("urls_index", templateVars);
 });
 
-app.get("/urls.json", (req, res) => {
-  res.json(urlDatabase);
+
+app.get("/register", (req, res) => {
+  const cookieID = req.cookies.name;
+  const templateVars = { urls: urlDatabase, username: null };
+  res.render("urls_register", templateVars)
 });
+
+
+app.post("/register", (req, res) => {
+  const userEmail = req.body.email
+  const userPass = req.body.password
+  if (userEmail === '' || userPass === '') {
+    res.status(400)
+    res.send("Email and/or password cannot be blank")
+  }else if (checkEmailExists(userEmail) !== true) {
+    res.status(400)
+    res.send("Email already exists")
+  } else {
+    const userID = generateRandomString();
+    users[userID] = {
+      id: userID,
+      email: userEmail,
+      password: userPass
+    };
+    //Set Cookie w. ID
+    console.log("NEW REG:", users[userID]['id'])
+    res.cookie('name', users[userID]['id']);
+    //redirect to /urls
+    res.redirect(`/urls/`)
+  }
+})
 
 
 // LOGIN
@@ -109,21 +140,6 @@ app.post("/logout", (req, res) => {
 });
 
 
-app.post("/register", (req, res) => {
-  const userEmail = req.body.email
-  const userPass = req.body.password
-  const userID = generateRandomString();
-  users[userID] = {
-    id: userID,
-    email: userEmail,
-    password: userPass
-  };
-  //Set Cookie w. ID
-  console.log("NEW REG:", users[userID]['id'])
-  res.cookie('name', users[userID]['id']);
-  //redirect to /urls
-  res.redirect(`/urls/`)
-})
 
 
 app.get("/urls/new", (req, res) => {
