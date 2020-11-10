@@ -31,11 +31,19 @@ app.listen(PORT, () => {
 
 //=========Method Handling========================================================
 
+//----------CREATE----------------
+//----------READ------------------
+//----------UPDATE----------------
+//----------DELETE----------------
 
 app.get("/", (req, res) => {
   res.redirect(`/urls/`)
 });
 
+app.get("/register", (req,res) =>{
+  const templateVars = { urls: urlDatabase, username: req.cookies.name };
+  res.render("urls_register", templateVars)
+});
 
 app.get("/urls", (req, res) => {
   const templateVars = { urls: urlDatabase, username: req.cookies.name };
@@ -75,7 +83,6 @@ app.post("/urls", (req, res) => {
   const urlID = generateRandomString();
   urlDatabase[urlID] = inputLongURL;
   res.redirect(`/urls/${urlID}`)
-  // res.send("Ok");         // Respond with 'Ok' (we will replace this)
 });
 
 
