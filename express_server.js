@@ -73,8 +73,6 @@ const checkPass = function (userID, inputPass) {
 }
 
 
-
-
 //========Set Server to Listen===================================================
 
 app.listen(PORT, () => {
@@ -84,35 +82,6 @@ app.listen(PORT, () => {
 //=========Method Handling========================================================
 
 //----------CREATE----------------
-//----------READ------------------
-//----------UPDATE----------------
-//----------DELETE----------------
-
-app.get("/", (req, res) => {
-  res.redirect(`/login/`)
-});
-
-app.get("/urls.json", (req, res) => {
-  res.json(urlDatabase);
-});
-
-app.get("/urls", (req, res) => {
-  const cookieID = req.cookies.user_id;
-  let userEmail = null;
-  if (checkCookie(cookieID) === true) {
-    userEmail = users[cookieID].email;
-  }
-  const templateVars = { urls: urlDatabase, username: userEmail };
-  res.render("urls_index", templateVars);
-});
-
-
-app.get("/register", (req, res) => {
-  const cookieID = req.cookies.user_id;
-  const templateVars = { urls: urlDatabase, username: null };
-  res.render("urls_register", templateVars)
-});
-
 
 app.post("/register", (req, res) => {
   const userEmail = req.body.email
@@ -137,18 +106,6 @@ app.post("/register", (req, res) => {
     res.redirect(`/urls/`)
   }
 })
-
-app.get("/login", (req, res) => {
-  const cookieID = req.cookies.user_id;
-  let userEmail = null;
-  if (checkCookie(cookieID) === true) {
-    res.redirect('/urls')
-  } else {
-  const templateVars = { username: userEmail };
-  res.render('urls_login', templateVars)
-  }
-});
-
 
 // LOGIN
 app.post("/login", (req, res) => {
@@ -182,8 +139,50 @@ app.post("/logout", (req, res) => {
   res.redirect(`/login/`)
 });
 
+//POST > Create new shortURL 
+app.post("/urls", (req, res) => {
+  const inputLongURL = req.body.longURL;  // req.body =  { longURL: 'google.ca' }
+  const urlID = generateRandomString();
+  urlDatabase[urlID] = inputLongURL;
+  res.redirect(`/urls/${urlID}`)
+});
 
 
+//----------READ------------------
+app.get("/", (req, res) => {
+  res.redirect(`/login/`)
+});
+
+app.get("/urls.json", (req, res) => {
+  res.json(urlDatabase);
+});
+
+app.get("/urls", (req, res) => {
+  const cookieID = req.cookies.user_id;
+  let userEmail = null;
+  if (checkCookie(cookieID) === true) {
+    userEmail = users[cookieID].email;
+  }
+  const templateVars = { urls: urlDatabase, username: userEmail };
+  res.render("urls_index", templateVars);
+});
+
+app.get("/register", (req, res) => {
+  const cookieID = req.cookies.user_id;
+  const templateVars = { urls: urlDatabase, username: null };
+  res.render("urls_register", templateVars)
+});
+
+app.get("/login", (req, res) => {
+  const cookieID = req.cookies.user_id;
+  let userEmail = null;
+  if (checkCookie(cookieID) === true) {
+    res.redirect('/urls')
+  } else {
+  const templateVars = { username: userEmail };
+  res.render('urls_login', templateVars)
+  }
+});
 
 app.get("/urls/new", (req, res) => {
   const cookieID = req.cookies.user_id;
@@ -195,23 +194,13 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new", templateVars);
 });
 
-//POST > Create new shortURL 
-app.post("/urls", (req, res) => {
-  const inputLongURL = req.body.longURL;  // req.body =  { longURL: 'google.ca' }
-  const urlID = generateRandomString();
-  urlDatabase[urlID] = inputLongURL;
-  res.redirect(`/urls/${urlID}`)
-});
+//----------UPDATE----------------
+
+//----------DELETE----------------
 
 
 
-//POST > DELETE an Entry from DB
-app.post("/urls/:shortURL/delete", (req, res) => {
-  shortURL = req.url.substring(6, 12)
-  console.log(`Deleted Entry for ${shortURL}, ${urlDatabase[shortURL]}`)
-  delete urlDatabase[shortURL];
-  res.redirect(`/urls/`)
-});
+//----------OTHER / REFERENCED----------------
 
 //Short URL Info
 app.get("/urls/:shortURL", (req, res) => {
@@ -243,12 +232,3 @@ app.get("/u/:shortURL", (req, res) => {
   }
   res.redirect(longURL)
 });
-
-// app.get("/hello", (req, res) => {
-//   const templateVars = { greeting: 'Hello World!' };
-//   //param 1 is the EJS file(./views), param 2 is what data its using
-//   res.render("hello_world", templateVars);
-// });
-
- //===============================================================================
-
