@@ -31,7 +31,7 @@ const users = {
   },
   "mlbu81": {
     id: "mlbu81",
-    email: "a@a.com",
+    email: "2@2.com",
     password: "1234"
   }
 }
@@ -97,7 +97,7 @@ app.get("/urls.json", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-  const cookieID = req.cookies.name;
+  const cookieID = req.cookies.user_id;
   let userEmail = null;
   if (checkCookie(cookieID) === true) {
     userEmail = users[cookieID].email;
@@ -108,7 +108,7 @@ app.get("/urls", (req, res) => {
 
 
 app.get("/register", (req, res) => {
-  const cookieID = req.cookies.name;
+  const cookieID = req.cookies.user_id;
   const templateVars = { urls: urlDatabase, username: null };
   res.render("urls_register", templateVars)
 });
@@ -132,14 +132,14 @@ app.post("/register", (req, res) => {
     };
     //Set Cookie w. ID
     console.log("NEW REG:", users[userID]['id'])
-    res.cookie('name', users[userID]['id']);
+    res.cookie('user_id', users[userID]['id']);
     //redirect to /urls
     res.redirect(`/urls/`)
   }
 })
 
 app.get("/login", (req, res) => {
-  const cookieID = req.cookies.name;
+  const cookieID = req.cookies.user_id;
   let userEmail = null;
   if (checkCookie(cookieID) === true) {
     res.redirect('/urls')
@@ -161,33 +161,32 @@ app.post("/login", (req, res) => {
   } 
   const userID = findUserID(userEmail)
   if (userID === false) {
-    res.status(400)
+    res.status(403)
     res.send("User does not exists")
   } else if(checkPass(userID, userPass) !== true) {
-    res.status(400)
+    res.status(403)
     res.send("Password is incorrect")
   } else {
      //Set Cookie w. ID
      console.log("NEW LOGIN BY:", users[userID]['id'])
-     res.cookie('name', users[userID]['id']);
+     res.cookie('user_id', users[userID]['id']);
      //redirect to /urls
-     const templateVars = { urls: urlDatabase, username: userEmail };
-     res.render("urls_index", templateVars);
+     res.redirect('/urls')
   }
 });
 
 //LOGOUT
 app.post("/logout", (req, res) => {
   console.log(req.body.username + " Logged OUT")
-  res.clearCookie('name')
-  res.redirect(`/urls/`)
+  res.clearCookie('user_id')
+  res.redirect(`/login/`)
 });
 
 
 
 
 app.get("/urls/new", (req, res) => {
-  const cookieID = req.cookies.name;
+  const cookieID = req.cookies.user_id;
   let userEmail = null;
   if (checkCookie(cookieID) === true) {
     userEmail = users[cookieID].email;
@@ -216,7 +215,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 
 //Short URL Info
 app.get("/urls/:shortURL", (req, res) => {
-  const cookieID = req.cookies.name;
+  const cookieID = req.cookies.user_id;
   let userEmail = null;
   if (checkCookie(cookieID) === true) {
     userEmail = users[cookieID].email;
