@@ -31,7 +31,7 @@ const users = {
   },
   "mlbu81": {
     id: "mlbu81",
-    email: "chuck@example.com",
+    email: "a@a.com",
     password: "1234"
   }
 }
@@ -49,7 +49,7 @@ const checkCookie = function (cookieID) {
 
 const checkEmailExists = function (inputEmail) {
   for (user in users) {
-    if (inputEmail === user.email) {
+    if (inputEmail === users[user]['email']) {
       return true;
     }
   }
@@ -101,10 +101,11 @@ app.get("/register", (req, res) => {
 app.post("/register", (req, res) => {
   const userEmail = req.body.email
   const userPass = req.body.password
+  console.log("CHUECK",checkEmailExists(userEmail))
   if (userEmail === '' || userPass === '') {
     res.status(400)
     res.send("Email and/or password cannot be blank")
-  }else if (checkEmailExists(userEmail) !== true) {
+  } else if (checkEmailExists(userEmail) === true) {
     res.status(400)
     res.send("Email already exists")
   } else {
@@ -122,9 +123,37 @@ app.post("/register", (req, res) => {
   }
 })
 
+app.get("/login", (req, res) => {
+  const templateVars = { username: null };
+  res.render('urls_login', templateVars)
+});
+
 
 // LOGIN
 app.post("/login", (req, res) => {
+  const userEmail = req.body.email
+  const userPass = req.body.password
+  if (userEmail === '' || userPass === '') {
+    res.status(400)
+    res.send("Email and/or password cannot be blank")
+  } else if (checkEmailExists(userEmail) !== true) {
+    res.status(400)
+    res.send("Email already exists")
+  } else {
+    const userID = generateRandomString();
+    users[userID] = {
+      id: userID,
+      email: userEmail,
+      password: userPass
+    };
+    //Set Cookie w. ID
+    console.log("NEW REG:", users[userID]['id'])
+    res.cookie('name', users[userID]['id']);
+    //redirect to /urls
+    res.render("urls_index", templateVars);
+  }
+
+
   const inputUsername = req.body.username
   res.cookie('name', inputUsername);      //Sends cookie TO CLIENT
   const templateVars = { urls: urlDatabase, username: inputUsername };
