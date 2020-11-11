@@ -56,6 +56,22 @@ const checkEmailExists = function (inputEmail) {
   return false;
 }
 
+const findUserID = function (inputEmail){
+  for (user in users){
+    if (inputEmail === users[user]['email']){
+      return users[user]['id']
+    }
+  }
+  return false;
+}
+
+const checkPass = function (userID, inputPass) {
+    if (inputPass === users[userID]['password']) {
+    return true;
+  }
+  return false;
+}
+
 
 
 
@@ -101,7 +117,7 @@ app.get("/register", (req, res) => {
 app.post("/register", (req, res) => {
   const userEmail = req.body.email
   const userPass = req.body.password
-  console.log("CHUECK",checkEmailExists(userEmail))
+  console.log("CHUECK", checkEmailExists(userEmail))
   if (userEmail === '' || userPass === '') {
     res.status(400)
     res.send("Email and/or password cannot be blank")
@@ -133,32 +149,26 @@ app.get("/login", (req, res) => {
 app.post("/login", (req, res) => {
   const userEmail = req.body.email
   const userPass = req.body.password
+  
   if (userEmail === '' || userPass === '') {
     res.status(400)
     res.send("Email and/or password cannot be blank")
-  } else if (checkEmailExists(userEmail) !== true) {
+  } 
+  const userID = findUserID(userEmail)
+  if (userID === false) {
     res.status(400)
-    res.send("Email already exists")
+    res.send("User does not exists")
+  } else if(checkPass(userID, userPass) !== true) {
+    res.status(400)
+    res.send("Password is incorrect")
   } else {
-    const userID = generateRandomString();
-    users[userID] = {
-      id: userID,
-      email: userEmail,
-      password: userPass
-    };
-    //Set Cookie w. ID
-    console.log("NEW REG:", users[userID]['id'])
-    res.cookie('name', users[userID]['id']);
-    //redirect to /urls
-    res.render("urls_index", templateVars);
+     //Set Cookie w. ID
+     console.log("NEW LOGIN BY:", users[userID]['id'])
+     res.cookie('name', users[userID]['id']);
+     //redirect to /urls
+     const templateVars = { urls: urlDatabase, username: userEmail };
+     res.render("urls_index", templateVars);
   }
-
-
-  const inputUsername = req.body.username
-  res.cookie('name', inputUsername);      //Sends cookie TO CLIENT
-  const templateVars = { urls: urlDatabase, username: inputUsername };
-  console.log(templateVars.username + " LOGGED IN")
-  res.render("urls_index", templateVars);
 });
 
 //LOGOUT
