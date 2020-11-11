@@ -89,7 +89,7 @@ app.listen(PORT, () => {
 //----------DELETE----------------
 
 app.get("/", (req, res) => {
-  res.redirect(`/urls/`)
+  res.redirect(`/login/`)
 });
 
 app.get("/urls.json", (req, res) => {
@@ -117,7 +117,6 @@ app.get("/register", (req, res) => {
 app.post("/register", (req, res) => {
   const userEmail = req.body.email
   const userPass = req.body.password
-  console.log("CHUECK", checkEmailExists(userEmail))
   if (userEmail === '' || userPass === '') {
     res.status(400)
     res.send("Email and/or password cannot be blank")
@@ -140,8 +139,14 @@ app.post("/register", (req, res) => {
 })
 
 app.get("/login", (req, res) => {
-  const templateVars = { username: null };
+  const cookieID = req.cookies.name;
+  let userEmail = null;
+  if (checkCookie(cookieID) === true) {
+    res.redirect('/urls')
+  } else {
+  const templateVars = { username: userEmail };
   res.render('urls_login', templateVars)
+  }
 });
 
 

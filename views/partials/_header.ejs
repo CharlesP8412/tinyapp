@@ -21,12 +21,15 @@
           </form>
           <% }else{%>
   
-          <!--Offer Login Option -->
-          <form class="form-inline" action="/login" method="POST">
-            <input class="form-control" type="text" name="username" placeholder="Username"
-              style="width: 150px; margin: 1em">
-            <button type="submit" class="btn btn-outline-dark">Login</button>
+          <!--Offer Login/ Register Buttons -->
+          <form class="form-inline" action="/register" method="GET">
+            <button type="submit" class="btn btn-info">Register</button>
           </form>
+          <form class="form-inline" action="/login" method="GET">
+            <button type="submit" class="btn btn-primary">Login</button>
+          </form>
+
+        
           <% }%>
           <!-- FORM ------------------------------------------------------------------------------    -->
   
