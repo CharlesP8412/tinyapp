@@ -4,6 +4,7 @@ const app = express();
 const PORT = 8080;
 const bodyParser = require("body-parser");
 const cookieParser = require('cookie-parser')
+const bcrypt = require('bcrypt');
 
 //======= Settings ====================================================
 app.set('view engine', 'ejs');
@@ -23,22 +24,22 @@ const users = {
   "userRandomID": {
     id: "userRandomID",
     email: "user@example.com",
-    password: "purple-monkey-dinosaur"
+    password: "$2b$10$MKiLD8HfLurkYLCVz4ypAuYO3VJ4q1AAA4Ry8iQ7CuvQVllE098Ii" //purple-monkey-dinosaur
   },
   "user2RandomID": {
     id: "user2RandomID",
     email: "user2@example.com",
-    password: "dishwasher-funk"
+    password: "$2b$10$ciB7sG1gxJEEw5AFVKh6XuSZVg.IKQuTBZBIuB2RvJ6M.iCWwHeNC"  //"dishwasher-funk"
   },
   "mlbu81": {
     id: "mlbu81",
     email: "2@2.com",
-    password: "2"
+    password: "$2b$10$XWgGwPp/8ue7cK/iFYfU3eooTtBLmXABnKzZyIvptkC4GFu1nZavC"  //2
   },
   "asd234": {
     id: "asd234",
     email: "1@2.com",
-    password: "2"
+    password: "$2b$10$XWgGwPp/8ue7cK/iFYfU3eooTtBLmXABnKzZyIvptkC4GFu1nZavC" //2
   }
 }
 
@@ -72,11 +73,19 @@ const findIDbyEmail = function (inputEmail) {
 }
 
 const checkPass = function (userID, inputPass) {
-  if (inputPass === users[userID]['password']) {
+  hashedPassword = users[userID]['password'];
+  console.log('checking pass')
+  // if (inputPass === users[userID]['password']) {
+  if (bcrypt.compareSync(inputPass, hashedPassword)) {
     return true;
   }
   return false;
+  
 }
+
+
+
+
 
 
 //========Set Server to Listen===================================================
@@ -103,8 +112,9 @@ app.post("/register", (req, res) => {
     users[userID] = {
       id: userID,
       email: userEmail,
-      password: userPass
+      password: bcrypt.hashSync(userPass, 10)
     };
+    console.log("hash", users)
     //Set Cookie w. ID
     console.log("NEW REG:", users[userID]['id'])
     res.cookie('user_id', users[userID]['id']);
