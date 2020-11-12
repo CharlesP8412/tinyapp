@@ -3,8 +3,9 @@ const express = require("express");
 const app = express();
 const PORT = 8080;
 const bodyParser = require("body-parser");
-const cookieParser = require('cookie-parser')
+// const cookieParser = require('cookie-parser')
 const bcrypt = require('bcrypt');
+const cookieSession = require('cookie-session')
 
 //======= Settings ====================================================
 app.set('view engine', 'ejs');
@@ -82,11 +83,6 @@ const checkPass = function (userID, inputPass) {
   return false;
   
 }
-
-
-
-
-
 
 //========Set Server to Listen===================================================
 
