@@ -10,8 +10,12 @@ const cookieSession = require('cookie-session')
 //======= Settings ====================================================
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cookieParser())
+// app.use(cookieParser())
 
+app.use(cookieSession({
+  name: 'user_id',
+  keys: ['key1', 'key2'],
+}))
 
 
 //========= Site Info & Functions ==================================================
@@ -138,7 +142,8 @@ app.post("/login", (req, res) => {
   } else {
     //Set Cookie w. ID
     console.log("NEW LOGIN BY:", users[userID]['id'])
-    res.cookie('user_id', users[userID]['id']);
+    req.session['user_id'] = users[userID]['id'];
+
     //redirect to /urls
     res.redirect('/urls')
   }
@@ -147,13 +152,13 @@ app.post("/login", (req, res) => {
 //LOGOUT
 app.post("/logout", (req, res) => {
   console.log(req.body.username + " Logged OUT")
-  res.clearCookie('user_id')
+  req.session = null;  // Should this be res?
   res.redirect(`/login/`)
 });
 
 //POST > Create new shortURL 
 app.post("/urls", (req, res) => {
-  const cookieID = req.cookies.user_id;
+  const cookieID = req.session.user_id;
   let userEmail = null;
   if (checkCookie(cookieID) === true) {
     const inputLongURL = req.body.longURL;  // req.body =  { longURL: 'google.ca' }
@@ -177,7 +182,7 @@ app.get("/urls.json", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-  const cookieID = req.cookies.user_id;
+  const cookieID = req.session['user_id'];
   let userEmail = null;
   if (checkCookie(cookieID) === true) {
     userEmail = users[cookieID].email;
@@ -190,13 +195,13 @@ app.get("/urls", (req, res) => {
 });
 
 app.get("/register", (req, res) => {
-  const cookieID = req.cookies.user_id;
   const templateVars = { username: null };
   res.render("urls_register", templateVars)
 });
 
 app.get("/login", (req, res) => {
-  const cookieID = req.cookies.user_id;
+  const cookieID = req.session['user_id'];
+  console.log("CookieID",cookieID)
   let userEmail = null;
   if (checkCookie(cookieID) === true) {
     res.redirect('/urls')
@@ -207,7 +212,7 @@ app.get("/login", (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
-  const cookieID = req.cookies.user_id;
+  const cookieID = req.session.user_id;
   let userEmail = null;
   if (checkCookie(cookieID) === true) {
     userEmail = users[cookieID].email;
@@ -224,7 +229,7 @@ app.get("/urls/new", (req, res) => {
 //----------DELETE----------------
 //POST > DELETE an Entry from DB
 app.post("/urls/:shortURL/delete", (req, res) => {
-  const cookieID = req.cookies.user_id;
+  const cookieID = req.session.user_id;
   let userEmail = null;
   if (checkCookie(cookieID) === true) {
     shortURL = req.url.substring(6, 12)
@@ -241,7 +246,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 
 //Short URL Info
 app.get("/urls/:shortURL", (req, res) => {
-  const cookieID = req.cookies.user_id;
+  const cookieID = req.session.user_id;
   let userEmail = null;
   if (checkCookie(cookieID) === true) {
     userEmail = users[cookieID].email;
@@ -255,7 +260,7 @@ app.get("/urls/:shortURL", (req, res) => {
 
 //POST > EDIT an Entry in DB
 app.post("/urls/:shortURL", (req, res) => {
-  const cookieID = req.cookies.user_id;
+  const cookieID = req.session.user_id;
   let userEmail = null;
   if (checkCookie(cookieID) === true) {
     const inputLongURL = req.body.longURL;
