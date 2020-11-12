@@ -34,6 +34,11 @@ const users = {
     id: "mlbu81",
     email: "2@2.com",
     password: "2"
+  },
+  "asd234": {
+    id: "asd234",
+    email: "1@2.com",
+    password: "2"
   }
 }
 
@@ -57,7 +62,7 @@ const checkEmailExists = function (inputEmail) {
   return false;
 }
 
-const findUserID = function (inputEmail) {
+const findIDbyEmail = function (inputEmail) {
   for (user in users) {
     if (inputEmail === users[user]['email']) {
       return users[user]['id']
@@ -117,7 +122,7 @@ app.post("/login", (req, res) => {
     res.status(400)
     res.send("Email and/or password cannot be blank")
   }
-  const userID = findUserID(userEmail)
+  const userID = findIDbyEmail(userEmail)
   if (userID === false) {
     res.status(403)
     res.send("User does not exists")
@@ -142,10 +147,17 @@ app.post("/logout", (req, res) => {
 
 //POST > Create new shortURL 
 app.post("/urls", (req, res) => {
-  const inputLongURL = req.body.longURL;  // req.body =  { longURL: 'google.ca' }
-  const urlID = generateRandomString();
-  urlDatabase[urlID]['longURL'] = inputLongURL;
-  res.redirect(`/urls/${urlID}`)
+  const cookieID = req.cookies.user_id;
+  let userEmail = null;
+  if (checkCookie(cookieID) === true) {
+    const inputLongURL = req.body.longURL;  // req.body =  { longURL: 'google.ca' }
+    const urlID = generateRandomString();
+    urlDatabase[urlID] = {
+      longURL: inputLongURL,
+      userID: cookieID
+    };
+    res.redirect(`/urls/${urlID}`);
+  }
 });
 
 
@@ -206,10 +218,16 @@ app.get("/urls/new", (req, res) => {
 //----------DELETE----------------
 //POST > DELETE an Entry from DB
 app.post("/urls/:shortURL/delete", (req, res) => {
-  shortURL = req.url.substring(6, 12)
-  console.log(`Deleted Entry for shortURL ${shortURL}`)
-  delete urlDatabase[shortURL];
-  res.redirect(`/urls/`)
+  const cookieID = req.cookies.user_id;
+  let userEmail = null;
+  if (checkCookie(cookieID) === true) {
+    shortURL = req.url.substring(6, 12)
+    console.log(`Deleted Entry for shortURL ${shortURL}`)
+    delete urlDatabase[shortURL];
+    res.redirect(`/urls/`)
+  } else {
+    res.redirect(`/login/`)
+  }
 });
 
 
@@ -231,11 +249,18 @@ app.get("/urls/:shortURL", (req, res) => {
 
 //POST > EDIT an Entry in DB
 app.post("/urls/:shortURL", (req, res) => {
-  const inputLongURL = req.body.longURL;
-  shortURL = req.url.substring(6, 12)
-  console.log(`EDIT Entry for ${shortURL}, is now ${inputLongURL}`)
-  urlDatabase[shortURL]['longURL'] = inputLongURL;
-  res.redirect(`/urls/`)
+  const cookieID = req.cookies.user_id;
+  let userEmail = null;
+  if (checkCookie(cookieID) === true) {
+    const inputLongURL = req.body.longURL;
+    shortURL = req.url.substring(6, 12)
+    console.log(`EDIT Entry for ${shortURL}, is now ${inputLongURL}`)
+    urlDatabase[shortURL]['longURL'] = inputLongURL;
+    res.redirect(`/urls/`)
+  } else {
+    res.redirect('/login');
+  }
+
 });
 
 //Redirect to LongURL (using the shortURL)
