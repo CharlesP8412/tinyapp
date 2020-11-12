@@ -6,6 +6,7 @@ const bodyParser = require("body-parser");
 // const cookieParser = require('cookie-parser')
 const bcrypt = require('bcrypt');
 const cookieSession = require('cookie-session')
+const findIDbyEmail = require('./helper');
 
 //======= Settings ====================================================
 app.set('view engine', 'ejs');
@@ -68,14 +69,7 @@ const checkEmailExists = function (inputEmail) {
   return false;
 }
 
-const findIDbyEmail = function (inputEmail) {
-  for (user in users) {
-    if (inputEmail === users[user]['email']) {
-      return users[user]['id']
-    }
-  }
-  return false;
-}
+
 
 const checkPass = function (userID, inputPass) {
   hashedPassword = users[userID]['password'];
@@ -132,7 +126,7 @@ app.post("/login", (req, res) => {
     res.status(400)
     res.send("Email and/or password cannot be blank")
   }
-  const userID = findIDbyEmail(userEmail)
+  const userID = findIDbyEmail(userEmail, users)
   if (userID === false) {
     res.status(403)
     res.send("User does not exists")
