@@ -27,12 +27,17 @@
           <th scope="col">Delete</th>
         </tr>
       </thead>
+
       <tbody>
+        <!-- Check if the user is logged in-->
         <% if(username){ %>
+        <!-- Iterate over Database, IF userID matched DataBase ID use the info-->
         <% for(let url in urls) { %>
+        <% const dbID = urls[url]['userID']; %>
+        <% if (dbID === cookieID){ %>
         <tr>
           <td><%= url %></td>
-          <td><%= urls[url] %></td>
+          <td><%= urls[url]['longURL'] %></td>
           <td>
             <form method="GET" action="/urls/<%= url %>">
               <button type="edit" class="btn btn-outline-primary">Edit</button>
@@ -47,7 +52,9 @@
         </tr>
         <% } %>
         <% } %>
+        <% } %>
       </tbody>
+
     </table>
   </main>
   <!-- Bootstrap JS -->

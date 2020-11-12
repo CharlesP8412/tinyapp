@@ -14,8 +14,9 @@ app.use(cookieParser())
 
 //========= Site Info & Functions ==================================================
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  "b2xVn2": {longURL: "http://www.lighthouselabs.ca", userID: "mlbu81"},
+  "1sg5eL": {longURL: "http://www.google.com", userID: "mlbu81"},
+  "9sm5xK": {longURL: "http://www.google.com", userID: "user2RandomID"}
 };
 
 const users = {
@@ -32,7 +33,7 @@ const users = {
   "mlbu81": {
     id: "mlbu81",
     email: "2@2.com",
-    password: "1234"
+    password: "2"
   }
 }
 
@@ -143,7 +144,7 @@ app.post("/logout", (req, res) => {
 app.post("/urls", (req, res) => {
   const inputLongURL = req.body.longURL;  // req.body =  { longURL: 'google.ca' }
   const urlID = generateRandomString();
-  urlDatabase[urlID] = inputLongURL;
+  urlDatabase[urlID]['longURL'] = inputLongURL;
   res.redirect(`/urls/${urlID}`)
 });
 
@@ -163,13 +164,13 @@ app.get("/urls", (req, res) => {
   if (checkCookie(cookieID) === true) {
     userEmail = users[cookieID].email;
   }
-  const templateVars = { urls: urlDatabase, username: userEmail };
+  const templateVars = { urls: urlDatabase, username: userEmail, cookieID: cookieID };
   res.render("urls_index", templateVars);
 });
 
 app.get("/register", (req, res) => {
   const cookieID = req.cookies.user_id;
-  const templateVars = { urls: urlDatabase, username: null };
+  const templateVars = {username: null };
   res.render("urls_register", templateVars)
 });
 
@@ -189,9 +190,12 @@ app.get("/urls/new", (req, res) => {
   let userEmail = null;
   if (checkCookie(cookieID) === true) {
     userEmail = users[cookieID].email;
+    const templateVars = { username: userEmail };
+    res.render("urls_new", templateVars);
+  }else{
+    res.redirect("/login")
   }
-  const templateVars = { username: userEmail };
-  res.render("urls_new", templateVars);
+ 
 });
 
 //----------UPDATE----------------
@@ -210,7 +214,7 @@ app.get("/urls/:shortURL", (req, res) => {
     userEmail = users[cookieID].email;
   }
 
-  const longURL = urlDatabase[req.params.shortURL];
+  const longURL = urlDatabase[req.params.shortURL]['longURL'];
   const templateVars = { shortURL: req.params.shortURL, longURL: longURL, username: userEmail };
   res.render("urls_show", templateVars);
 });
@@ -220,13 +224,13 @@ app.post("/urls/:shortURL", (req, res) => {
   const inputLongURL = req.body.longURL;
   shortURL = req.url.substring(6, 12)
   console.log(`EDIT Entry for ${shortURL}, is now ${inputLongURL}`)
-  urlDatabase[shortURL] = inputLongURL;
+  urlDatabase[shortURL]['longURL'] = inputLongURL;
   res.redirect(`/urls/`)
 });
 
 //Redirect to LongURL (using the shortURL)
 app.get("/u/:shortURL", (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL];
+  const longURL = urlDatabase[req.params.shortURL]['longURL'];
   if (longURL === undefined) {
     res.redirect(`/urls/`)  // If code doesnt exist sent to My URLS ... Nice to add Message of some sort
   }
