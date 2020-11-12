@@ -5,7 +5,7 @@ const PORT = 8080;
 const bodyParser = require("body-parser");
 const bcrypt = require('bcrypt');
 const cookieSession = require('cookie-session');
-const getUserByEmail = require('./helpers');
+const { getUserByEmail, checkCookie, checkEmailExists } = require('./helpers');
 
 //======= Settings ====================================================
 app.set('view engine', 'ejs');
@@ -16,7 +16,7 @@ app.use(cookieSession({
 }));
 
 
-//========= Site Info & Functions ==================================================
+//========= Site Info & Functions =========================================================
 const urlDatabase = {
   "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userID: "mlbu81" },
   "1sg5eL": { longURL: "http://www.google.com", userID: "mlbu81" },
@@ -50,26 +50,9 @@ const generateRandomString = function() {
   return Math.random().toString(36).substring(2, 8);
 };
 
-const checkCookie = function(cookieID) {
-  if (!cookieID) {
-    return false;
-  }
-  return true;
-};
 
-const checkEmailExists = function(inputEmail) {
-  for (let user in users) {
-    if (inputEmail === users[user]['email']) {
-      return true;
-    }
-  }
-  return false;
-};
-
-
-
-const checkPass = function(userID, inputPass) {
-  const hashedPassword = users[userID]['password'];
+const checkPass = function(userID, inputPass, database) {
+  const hashedPassword = database[userID]['password'];
   console.log('checking pass');
   // if (inputPass === users[userID]['password']) {
   if (bcrypt.compareSync(inputPass, hashedPassword)) {
@@ -85,6 +68,8 @@ app.listen(PORT, () => {
   console.log(`TinyApp listening on port ${PORT}!`);
 });
 
+
+
 //=========Method Handling========================================================
 
 //----------CREATE----------------
@@ -95,7 +80,7 @@ app.post("/register", (req, res) => {
   if (userEmail === '' || userPass === '') {
     res.status(400);
     res.send("Email and/or password cannot be blank");
-  } else if (checkEmailExists(userEmail) === true) {
+  } else if (checkEmailExists(userEmail, users) === true) {
     res.status(400);
     res.send("Email already exists");
   } else {
@@ -127,7 +112,7 @@ app.post("/login", (req, res) => {
   if (userID === false) {
     res.status(403);
     res.send("User does not exists");
-  } else if (checkPass(userID, userPass) !== true) {
+  } else if (checkPass(userID, userPass, users) !== true) {
     res.status(403);
     res.send("Password is incorrect");
   } else {
