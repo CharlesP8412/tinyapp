@@ -1,11 +1,11 @@
-const findIDbyEmail = function (inputEmail, database) {
+const getUserByEmail = function (inputEmail, database) {
   for (user in database) {
     if (inputEmail === database[user]['email']) {
       return database[user]['id']
     }
   }
-  return false;
+  return undefined;
 }
 
 
-module.exports = findIDbyEmail
+module.exports = getUserByEmail;

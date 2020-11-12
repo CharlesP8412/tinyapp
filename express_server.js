@@ -6,7 +6,7 @@ const bodyParser = require("body-parser");
 // const cookieParser = require('cookie-parser')
 const bcrypt = require('bcrypt');
 const cookieSession = require('cookie-session')
-const findIDbyEmail = require('./helper');
+const getUserByEmail = require('./helpers');
 
 //======= Settings ====================================================
 app.set('view engine', 'ejs');
@@ -126,7 +126,7 @@ app.post("/login", (req, res) => {
     res.status(400)
     res.send("Email and/or password cannot be blank")
   }
-  const userID = findIDbyEmail(userEmail, users)
+  const userID = getUserByEmail(userEmail, users)
   if (userID === false) {
     res.status(403)
     res.send("User does not exists")
