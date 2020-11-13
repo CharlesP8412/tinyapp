@@ -31,6 +31,5 @@ TinyApp is a full stack web application built with Node and Express that allows 
 - Analytics - # of times a short URL is visited
 - Analytics - # of unique visitors for each URL
 - Analytics - Track every visit w. DTG and visitor_ID
-- Method Overrides
 
 
