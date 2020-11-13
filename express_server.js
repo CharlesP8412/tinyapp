@@ -1,5 +1,6 @@
 //====== Requirements / Modules =============================================
 const express = require("express");
+const methodOverride = require('method-override');
 const app = express();
 const PORT = 8080;
 const bodyParser = require("body-parser");
@@ -14,7 +15,7 @@ app.use(cookieSession({
   name: 'user_id',
   keys: ['key1', 'key2'],
 }));
-
+app.use(methodOverride('_method'));
 
 //========= Site Info & Functions =========================================================
 const urlDatabase = {
@@ -187,9 +188,32 @@ app.get("/urls/new", (req, res) => {
 
 //----------UPDATE----------------
 
+//EDIT an Entry in DB - Uses Method OVERIDE
+app.put("/urls/:shortURL", (req, res) => {
+  const cookieID = req.session.user_id;
+  const inputLongURL = req.body.longURL;
+  const inputShortURL = req.url.substring(6, 12);
+  //Check if logged in
+  if (checkCookie(cookieID) === true) {
+    //Check is shortURL belongs to user
+    const urlOwner = findShortURLOwner(inputShortURL, urlDatabase);
+    if (cookieID === urlOwner) {
+      // console.log(`EDIT Entry for ${inputShortURL}, is now ${inputLongURL}, by ${cookieID}`);
+      urlDatabase[inputShortURL]['longURL'] = inputLongURL;
+      res.redirect(`/urls/`);
+    } else {
+      res.status(403);
+      res.send("Input Error: ensure your short URL is typed correctly");
+    }
+  } else {
+    res.redirect('/login');
+  }
+
+});
+
 //----------DELETE----------------
-//POST > DELETE an Entry from DB
-app.post("/urls/:shortURL/delete", (req, res) => {
+//> DELETE an Entry from DB - uses Method Overide
+app.delete("/urls/:shortURL", (req, res) => {
   const cookieID = req.session.user_id;
   const inputShortURL = req.url.substring(6, 12);
   if (checkCookie(cookieID) === true) {
@@ -232,29 +256,6 @@ app.get("/urls/:shortURL", (req, res) => {
   } else {
     res.redirect('/login');
   }
-});
-
-//POST > EDIT an Entry in DB
-app.post("/urls/:shortURL", (req, res) => {
-  const cookieID = req.session.user_id;
-  const inputLongURL = req.body.longURL;
-  const inputShortURL = req.url.substring(6, 12);
-  //Check if logged in
-  if (checkCookie(cookieID) === true) {
-    //Check is shortURL belongs to user
-    const urlOwner = findShortURLOwner(inputShortURL, urlDatabase);
-    if (cookieID === urlOwner) {
-      // console.log(`EDIT Entry for ${inputShortURL}, is now ${inputLongURL}, by ${cookieID}`);
-      urlDatabase[inputShortURL]['longURL'] = inputLongURL;
-      res.redirect(`/urls/`);
-    } else {
-      res.status(403);
-      res.send("Input Error: ensure your short URL is typed correctly");
-    }
-  } else {
-    res.redirect('/login');
-  }
-
 });
 
 //Redirect to LongURL (using the shortURL)

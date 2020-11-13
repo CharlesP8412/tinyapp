@@ -21,7 +21,7 @@
 
 
   
-    <form class="form-row" action="/urls/<%= shortURL %>" method="POST">
+    <form class="form-row" action="/urls/<%= shortURL %>?_method=PUT" method="POST">
       <div class="form-group mb-2 col">
         <label for="longURL"><h2>Edit:</h2></label>
         <input class="form" type="text" name="longURL" placeholder="http:// new long URL" style="width: 200px; margin: 1em">
