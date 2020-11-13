@@ -62,6 +62,16 @@ const checkPass = function(userID, inputPass, database) {
 
 };
 
+const findShortURLOwner = function(inputShortURL, database) {
+  for (let url in database) {
+    if (inputShortURL === url) {
+      const urlOwner = database[url]['userID'];
+      return urlOwner;
+    }
+  }
+  return undefined;
+};
+
 //========Set Server to Listen===================================================
 
 app.listen(PORT, () => {
@@ -109,7 +119,8 @@ app.post("/login", (req, res) => {
     res.send("Email and/or password cannot be blank");
   }
   const userID = getUserByEmail(userEmail, users);
-  if (userID === false) {
+  console.log("IDCheck", userID);
+  if (userID === undefined) {
     res.status(403);
     res.send("User does not exists");
   } else if (checkPass(userID, userPass, users) !== true) {
@@ -119,7 +130,6 @@ app.post("/login", (req, res) => {
     //Set Cookie w. ID
     console.log("NEW LOGIN BY:", users[userID]['id']);
     req.session['user_id'] = users[userID]['id'];
-
     //redirect to /urls
     res.redirect('/urls');
   }
@@ -129,7 +139,7 @@ app.post("/login", (req, res) => {
 app.post("/logout", (req, res) => {
   console.log(req.body.username + " Logged OUT");
   req.session = null;  // Should this be res?
-  res.redirect(`/login/`);
+  res.redirect(`/urls/`);
 });
 
 //POST > Create new shortURL
@@ -170,8 +180,13 @@ app.get("/urls", (req, res) => {
 });
 
 app.get("/register", (req, res) => {
-  const templateVars = { username: null };
-  res.render("urls_register", templateVars);
+  const cookieID = req.session['user_id'];
+  if (checkCookie(cookieID) === true) {
+    res.redirect('/urls');
+  } else {
+    const templateVars = { username: null };
+    res.render("urls_register", templateVars);
+  }
 });
 
 app.get("/login", (req, res) => {
@@ -205,11 +220,18 @@ app.get("/urls/new", (req, res) => {
 //POST > DELETE an Entry from DB
 app.post("/urls/:shortURL/delete", (req, res) => {
   const cookieID = req.session.user_id;
+  const inputShortURL = req.url.substring(6, 12);
   if (checkCookie(cookieID) === true) {
-    const shortURL = req.url.substring(6, 12);
-    console.log(`Deleted Entry for shortURL ${shortURL}`);
-    delete urlDatabase[shortURL];
-    res.redirect(`/urls/`);
+    //Check is shortURL belongs to user
+    const urlOwner = findShortURLOwner(inputShortURL, urlDatabase);
+    if (cookieID === urlOwner) {
+      console.log(`Deleted Entry for shortURL ${inputShortURL}, by ${cookieID}`);
+      delete urlDatabase[inputShortURL];
+      res.redirect(`/urls/`);
+    } else {
+      res.status(403);
+      res.send("Input Error: ensure your short URL is typed correctly");
+    }
   } else {
     res.redirect(`/login/`);
   }
@@ -221,12 +243,21 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 //Short URL Info
 app.get("/urls/:shortURL", (req, res) => {
   const cookieID = req.session.user_id;
-  let userEmail = null;
+  const inputShortURL = req.params.shortURL;
+  // IF Logged in
   if (checkCookie(cookieID) === true) {
-    userEmail = users[cookieID].email;
-    const longURL = urlDatabase[req.params.shortURL]['longURL'];
-    const templateVars = { shortURL: req.params.shortURL, longURL: longURL, username: userEmail };
-    res.render("urls_show", templateVars);
+    //Check is shortURL belongs to user
+    const urlOwner = findShortURLOwner(inputShortURL, urlDatabase);
+    if (cookieID === urlOwner) {
+      //Generage Page
+      const userEmail = users[cookieID].email;
+      const longURL = urlDatabase[inputShortURL]['longURL'];
+      const templateVars = { shortURL: inputShortURL, longURL: longURL, username: userEmail };
+      res.render("urls_show", templateVars);
+    } else {
+      res.status(403);
+      res.send("Input Error: ensure your short URL is typed correctly");
+    }
   } else {
     res.redirect('/login');
   }
@@ -235,12 +266,20 @@ app.get("/urls/:shortURL", (req, res) => {
 //POST > EDIT an Entry in DB
 app.post("/urls/:shortURL", (req, res) => {
   const cookieID = req.session.user_id;
+  const inputLongURL = req.body.longURL;
+  const inputShortURL = req.url.substring(6, 12);
+  //Check if logged in
   if (checkCookie(cookieID) === true) {
-    const inputLongURL = req.body.longURL;
-    const shortURL = req.url.substring(6, 12);
-    console.log(`EDIT Entry for ${shortURL}, is now ${inputLongURL}`);
-    urlDatabase[shortURL]['longURL'] = inputLongURL;
-    res.redirect(`/urls/`);
+    //Check is shortURL belongs to user
+    const urlOwner = findShortURLOwner(inputShortURL, urlDatabase);
+    if (cookieID === urlOwner) {
+      console.log(`EDIT Entry for ${inputShortURL}, is now ${inputLongURL}, by ${cookieID}`);
+      urlDatabase[inputShortURL]['longURL'] = inputLongURL;
+      res.redirect(`/urls/`);
+    } else {
+      res.status(403);
+      res.send("Input Error: ensure your short URL is typed correctly");
+    }
   } else {
     res.redirect('/login');
   }
@@ -249,9 +288,13 @@ app.post("/urls/:shortURL", (req, res) => {
 
 //Redirect to LongURL (using the shortURL)
 app.get("/u/:shortURL", (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL]['longURL'];
-  if (longURL === undefined) {
-    res.redirect(`/urls/`);  // If code doesnt exist sent to My URLS ... Nice to add Message of some sort
+  const inputShortURL = req.params.shortURL;
+  const urlKey = urlDatabase[inputShortURL];
+  if (urlKey === undefined) {
+    res.status(403);
+    res.send("Error: Short URL does not exist");
+  } else {
+    const longURL = urlDatabase[inputShortURL]['longURL'];
+    res.redirect(longURL);
   }
-  res.redirect(longURL);
 });
