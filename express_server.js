@@ -5,7 +5,7 @@ const PORT = 8080;
 const bodyParser = require("body-parser");
 const bcrypt = require('bcrypt');
 const cookieSession = require('cookie-session');
-const { getUserByEmail, checkCookie, checkEmailExists } = require('./helpers');
+const { getUserByEmail, checkCookie, checkEmailExists, findShortURLOwner } = require('./helpers');
 
 //======= Settings ====================================================
 app.set('view engine', 'ejs');
@@ -62,15 +62,7 @@ const checkPass = function(userID, inputPass, database) {
 
 };
 
-const findShortURLOwner = function(inputShortURL, database) {
-  for (let url in database) {
-    if (inputShortURL === url) {
-      const urlOwner = database[url]['userID'];
-      return urlOwner;
-    }
-  }
-  return undefined;
-};
+
 
 //========Set Server to Listen===================================================
 

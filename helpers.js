@@ -24,13 +24,22 @@ const checkEmailExists = function(inputEmail, database) {
   return false;
 };
 
-
+const findShortURLOwner = function(inputShortURL, database) {
+  for (let url in database) {
+    if (inputShortURL === url) {
+      const urlOwner = database[url]['userID'];
+      return urlOwner;
+    }
+  }
+  return undefined;
+};
 
 
 
 
 module.exports = {
   getUserByEmail,
-    checkCookie,
-  checkEmailExists
+  checkCookie,
+  checkEmailExists,
+  findShortURLOwner
 };
