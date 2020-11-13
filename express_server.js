@@ -95,7 +95,7 @@ app.post("/register", (req, res) => {
     const userID = generateRandomString();
     users[userID] = {
       id: userID,
-      email: userEmail,
+      email: userEmail.toLowerCase(),
       password: bcrypt.hashSync(userPass, 10)
     };
     //Set Cookie w. ID
@@ -107,7 +107,8 @@ app.post("/register", (req, res) => {
 
 // LOGIN
 app.post("/login", (req, res) => {
-  const userEmail = req.body.email;
+  let userEmail = req.body.email;
+  userEmail = userEmail.toLowerCase();
   const userPass = req.body.password;
 
   if (userEmail === '' || userPass === '') {

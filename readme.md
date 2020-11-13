@@ -24,8 +24,8 @@ TinyApp is a full stack web application built with Node and Express that allows 
 - Run the development web server using the `node express_server.js` command.
 
 ## Known Issues
-- Email (Login) and urls are case sensitive
-- No URL Validation
+- Email (Login) are case sensitive - *Need to add .lowerCase to inputs*
+- No URL Validation (a user can enter any string it isn't checked if it is a valid URL).  *Possible Solution Send a GET to the submitted URL to confirm it works.*
 
 
 ## Features to be added
