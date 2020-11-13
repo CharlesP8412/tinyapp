@@ -5,7 +5,7 @@ const PORT = 8080;
 const bodyParser = require("body-parser");
 const bcrypt = require('bcrypt');
 const cookieSession = require('cookie-session');
-const { getUserByEmail, checkCookie, checkEmailExists, findShortURLOwner } = require('./helpers');
+const { getUserByEmail, checkCookie, checkEmailExists, findShortURLOwner, generateRandomString, checkPass } = require('./helpers');
 
 //======= Settings ====================================================
 app.set('view engine', 'ejs');
@@ -45,23 +45,6 @@ const users = {
     password: "$2b$10$XWgGwPp/8ue7cK/iFYfU3eooTtBLmXABnKzZyIvptkC4GFu1nZavC" //2
   }
 };
-
-const generateRandomString = function() {
-  return Math.random().toString(36).substring(2, 8);
-};
-
-
-const checkPass = function(userID, inputPass, database) {
-  const hashedPassword = database[userID]['password'];
-  // console.log('checking pass');
-  // if (inputPass === users[userID]['password']) {
-  if (bcrypt.compareSync(inputPass, hashedPassword)) {
-    return true;
-  }
-  return false;
-
-};
-
 
 
 //========Set Server to Listen===================================================

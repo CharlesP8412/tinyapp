@@ -1,3 +1,5 @@
+const bcrypt = require('bcrypt');
+
 const getUserByEmail = function(inputEmail, database) {
   for (let user in database) {
     if (inputEmail === database[user]['email']) {
@@ -34,12 +36,26 @@ const findShortURLOwner = function(inputShortURL, database) {
   return undefined;
 };
 
+const generateRandomString = function() {
+  return Math.random().toString(36).substring(2, 8);
+};
 
+const checkPass = function(userID, inputPass, database) {
+  const hashedPassword = database[userID]['password'];
+  // console.log('checking pass');
+  // if (inputPass === users[userID]['password']) {
+  if (bcrypt.compareSync(inputPass, hashedPassword)) {
+    return true;
+  }
+  return false;
 
+};
 
 module.exports = {
   getUserByEmail,
   checkCookie,
   checkEmailExists,
-  findShortURLOwner
+  findShortURLOwner,
+  generateRandomString,
+  checkPass
 };
