@@ -53,7 +53,7 @@ const generateRandomString = function() {
 
 const checkPass = function(userID, inputPass, database) {
   const hashedPassword = database[userID]['password'];
-  console.log('checking pass');
+  // console.log('checking pass');
   // if (inputPass === users[userID]['password']) {
   if (bcrypt.compareSync(inputPass, hashedPassword)) {
     return true;
@@ -98,9 +98,7 @@ app.post("/register", (req, res) => {
       email: userEmail,
       password: bcrypt.hashSync(userPass, 10)
     };
-    console.log("hash", users);
     //Set Cookie w. ID
-    console.log("NEW REG:", users[userID]['id']);
     req.session['user_id'] = users[userID]['id'];
     //redirect to /urls
     res.redirect(`/urls/`);
@@ -117,7 +115,6 @@ app.post("/login", (req, res) => {
     res.send("Email and/or password cannot be blank");
   }
   const userID = getUserByEmail(userEmail, users);
-  console.log("IDCheck", userID);
   if (userID === undefined) {
     res.status(403);
     res.send("User does not exists");
@@ -126,7 +123,7 @@ app.post("/login", (req, res) => {
     res.send("Password is incorrect");
   } else {
     //Set Cookie w. ID
-    console.log("NEW LOGIN BY:", users[userID]['id']);
+    // console.log("NEW LOGIN BY:", users[userID]['id']);
     req.session['user_id'] = users[userID]['id'];
     //redirect to /urls
     res.redirect('/urls');
@@ -135,7 +132,7 @@ app.post("/login", (req, res) => {
 
 //LOGOUT
 app.post("/logout", (req, res) => {
-  console.log(req.body.username + " Logged OUT");
+  // console.log(req.body.username + " Logged OUT");
   req.session = null;  // Should this be res?
   res.redirect(`/urls/`);
 });
@@ -189,7 +186,7 @@ app.get("/register", (req, res) => {
 
 app.get("/login", (req, res) => {
   const cookieID = req.session['user_id'];
-  console.log("CookieID", cookieID);
+  // console.log("CookieID", cookieID);
   let userEmail = null;
   if (checkCookie(cookieID) === true) {
     res.redirect('/urls');
@@ -223,7 +220,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
     //Check is shortURL belongs to user
     const urlOwner = findShortURLOwner(inputShortURL, urlDatabase);
     if (cookieID === urlOwner) {
-      console.log(`Deleted Entry for shortURL ${inputShortURL}, by ${cookieID}`);
+      // console.log(`Deleted Entry for shortURL ${inputShortURL}, by ${cookieID}`);
       delete urlDatabase[inputShortURL];
       res.redirect(`/urls/`);
     } else {
@@ -271,7 +268,7 @@ app.post("/urls/:shortURL", (req, res) => {
     //Check is shortURL belongs to user
     const urlOwner = findShortURLOwner(inputShortURL, urlDatabase);
     if (cookieID === urlOwner) {
-      console.log(`EDIT Entry for ${inputShortURL}, is now ${inputLongURL}, by ${cookieID}`);
+      // console.log(`EDIT Entry for ${inputShortURL}, is now ${inputLongURL}, by ${cookieID}`);
       urlDatabase[inputShortURL]['longURL'] = inputLongURL;
       res.redirect(`/urls/`);
     } else {
